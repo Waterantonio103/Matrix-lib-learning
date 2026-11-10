@@ -242,6 +242,12 @@ impl<T> Matrix<T> {
 
         Ok(Matrix::new(Dimensions::new(self.dimensions.rows, other.dimensions.columns), data))
     }
+
+    pub fn determinant(self) where T: Copy + Add {
+        let a = self.row(0).unwrap().get(0).unwrap();
+
+        let added = self.row(0).unwrap().add_num(*a);
+    }
 }
 
 impl<T: Display + Ord> Display for Matrix<T> {
@@ -330,9 +336,19 @@ impl<'a, T> Row<'a, T> {
         self.data.iter().copied()
     }
 
+    pub fn get(&self, index: usize) -> Option<&'a T> {
+        self.data.get(index).copied()
+    }
+
     pub fn add(&self, other: &Self) -> impl Iterator<Item = T::Output> where T: Copy + Add {
         self.iter().zip(other.iter()).map(|(&el1, &el2)| {
             el1 + el2
+        })
+    }
+
+    pub fn add_num(&self, num: T) -> impl Iterator<Item = T::Output> + use<T> where T: Copy + Add + use<T> {
+        self.iter().map(move |&el| {
+            el + num
         })
     }
 
